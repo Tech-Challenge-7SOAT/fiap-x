@@ -8,7 +8,7 @@ data class Video(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, unique = true)
-    val id: Long,
+    val id: Long? = null,
 
     @Column(name = "video_url", nullable = false)
     val videoUrl: String,

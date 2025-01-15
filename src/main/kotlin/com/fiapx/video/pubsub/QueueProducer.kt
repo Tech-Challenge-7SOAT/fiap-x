@@ -11,5 +11,5 @@ class QueueProducer(private val sqsTemplate: SqsTemplate) {
     @Value("\${sqs.queue-url}")
     private lateinit var queueUrl: String
 
-    fun send(message: VideoMessage) = sqsTemplate.send(queueUrl, message)
+    fun dispatch(message: VideoMessage) = sqsTemplate.send(queueUrl, message)
 }
