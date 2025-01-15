@@ -1,6 +1,5 @@
-package com.fiapx.video.core.entities
+package com.fiapx.video.entities
 
-import com.fiapx.video.core.valueObjects.Status
 import jakarta.persistence.*
 
 @Entity

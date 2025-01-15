@@ -1,4 +1,4 @@
-package com.fiapx.video.adapter.driver.controller
+package com.fiapx.video.http.controllers
 
 import com.fiapx.video.core.application.useCase.ProcessVideo
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -19,7 +19,9 @@ class VideoController(private val processVideo: ProcessVideo) {
     fun find(@PathVariable id: String) = emptyList<String>()
 
     @PostMapping("/")
-    fun store(@RequestParam("videos") videos: List<MultipartFile>) = videos.forEach { _ -> processVideo.execute() }
+    fun store(@RequestParam("videos") videos: List<MultipartFile>) = videos.forEach {
+        println(it.originalFilename)
+    }
 
     @DeleteMapping("/{id}")
     fun destroy(@PathVariable id: String) = emptyList<String>()

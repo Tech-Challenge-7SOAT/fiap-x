@@ -1,4 +1,4 @@
-package com.fiapx.video.core.requests
+package com.fiapx.video.http.resources
 
 data class UploadedVideoInfo(
     val fileName: String,
