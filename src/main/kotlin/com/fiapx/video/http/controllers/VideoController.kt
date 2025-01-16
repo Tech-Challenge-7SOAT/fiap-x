@@ -1,6 +1,5 @@
 package com.fiapx.video.http.controllers
 
-import com.fiapx.video.core.application.useCase.ProcessVideo
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -10,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.multipart.MultipartFile
 
 @RestController
-class VideoController(private val processVideo: ProcessVideo) {
+class VideoController {
 
     @GetMapping("/")
     fun index() = emptyList<String>()

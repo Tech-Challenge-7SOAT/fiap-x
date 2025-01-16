@@ -1,3 +1,9 @@
 package com.fiapx.video.entities
 
-data class VideoMessage(val id: Long, val videoUrl: String)
+import com.fasterxml.jackson.annotation.JsonCreator
+import com.fasterxml.jackson.annotation.JsonProperty
+
+data class VideoMessage @JsonCreator constructor(
+    @JsonProperty("id") val id: Long,
+    @JsonProperty("videoUrl") val videoUrl: String
+)

@@ -14,7 +14,7 @@ class VideoApplication : CommandLineRunner {
     private lateinit var queueProducer: QueueProducer
 
     override fun run(vararg args: String?) {
-        queueProducer.send(VideoMessage(2L, "Teste"))
+        queueProducer.dispatch(VideoMessage(3L, "Teste"))
     }
 }
 
