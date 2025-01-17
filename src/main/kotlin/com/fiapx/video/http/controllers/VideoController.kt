@@ -1,15 +1,11 @@
 package com.fiapx.video.http.controllers
 
-import org.springframework.web.bind.annotation.DeleteMapping
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.RestController
+import com.fiapx.video.services.VideoService
+import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 
 @RestController
-class VideoController {
+class VideoController(private val service: VideoService) {
 
     @GetMapping("/")
     fun index() = emptyList<String>()
@@ -18,9 +14,7 @@ class VideoController {
     fun find(@PathVariable id: String) = emptyList<String>()
 
     @PostMapping("/")
-    fun store(@RequestParam("videos") videos: List<MultipartFile>) = videos.forEach {
-        println(it.originalFilename)
-    }
+    fun store(@RequestParam("videos") videos: List<MultipartFile>) = service.startProcessing(videos)
 
     @DeleteMapping("/{id}")
     fun destroy(@PathVariable id: String) = emptyList<String>()
