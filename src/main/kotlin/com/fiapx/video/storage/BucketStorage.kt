@@ -9,12 +9,13 @@ import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.model.PutObjectRequest
 import java.net.URL
 import java.nio.file.Files
+import java.util.UUID
 
 @Service
 class BucketStorage(private val client: S3Client) {
 
     fun put(video: MultipartFile): URL {
-        val key = "uploads/${video.originalFilename}"
+        val key = "uploads/${UUID.randomUUID()}-${video.originalFilename}"
         val tempFile = Files.createTempFile("upload", video.originalFilename).also { video.transferTo(it) }
         val request = PutObjectRequest.builder()
             .bucket("fiapx-videos")
