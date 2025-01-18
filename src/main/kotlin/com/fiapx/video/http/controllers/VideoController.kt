@@ -14,7 +14,7 @@ class VideoController(private val service: VideoService) {
     fun find(@PathVariable id: String) = emptyList<String>()
 
     @PostMapping("/")
-    fun store(@RequestParam("videos") videos: List<MultipartFile>) = service.startProcessing(videos)
+    fun store(@RequestParam("videos") videos: List<MultipartFile>) = service.store(videos)
 
     @DeleteMapping("/{id}")
     fun destroy(@PathVariable id: String) = emptyList<String>()
