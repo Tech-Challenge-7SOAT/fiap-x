@@ -28,11 +28,14 @@ class SqsConfig {
     @Value("\${spring.cloud.aws.credentials.secret-key}")
     private lateinit var secretKey: String
 
+    @Value("\${spring.cloud.aws.region.static}")
+    private lateinit var region: String
+
     @Bean
     fun sqsAsyncClient(): SqsAsyncClient = SqsAsyncClient.builder()
         .credentialsProvider(StaticCredentialsProvider.create(AwsBasicCredentials.create(accessKey, secretKey)))
         .endpointOverride(URI.create(endpoint))
-        .region(Region.of("\${spring.cloud.aws.region.static}"))
+        .region(Region.of(region))
         .build()
 
     @Bean

@@ -8,14 +8,11 @@ import org.springframework.web.multipart.MultipartFile
 class VideoController(private val service: VideoService) {
 
     @GetMapping("/")
-    fun index() = emptyList<String>()
+    fun index() = service.findAll()
 
     @GetMapping("/{id}")
-    fun find(@PathVariable id: String) = emptyList<String>()
+    fun find(@PathVariable id: Long) = service.findById(id)
 
     @PostMapping("/")
     fun store(@RequestParam("videos") videos: List<MultipartFile>) = service.store(videos)
-
-    @DeleteMapping("/{id}")
-    fun destroy(@PathVariable id: String) = emptyList<String>()
 }

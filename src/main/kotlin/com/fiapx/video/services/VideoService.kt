@@ -3,57 +3,72 @@ package com.fiapx.video.services
 import com.fiapx.video.entities.Status
 import com.fiapx.video.entities.Video
 import com.fiapx.video.entities.VideoMessage
-import com.fiapx.video.extensions.framesFrom
+import com.fiapx.video.extensions.download
+import com.fiapx.video.extensions.notify
 import com.fiapx.video.extensions.upload
 import com.fiapx.video.pubsub.QueueProducer
 import com.fiapx.video.repositories.VideoRepository
-import com.fiapx.video.storage.BucketStorage
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import software.amazon.awssdk.services.s3.S3Client
+import software.amazon.awssdk.services.ses.SesClient
+import java.util.*
 
 @Service
 class VideoService(
+    private val mail: SesClient,
+    private val storage: S3Client,
     private val queue: QueueProducer,
+    private val converter: VideoConverter,
     private val repository: VideoRepository,
-    private val storage: BucketStorage,
-    private val s3Client: S3Client
 ) {
 
-    fun store(videos: List<MultipartFile>) = videos.forEach { video ->
-        val uploadedFile = storage.put(video)
+    @Value("\${sns.topic.arn}")
+    private lateinit var topic: String
+
+    fun store(videos: List<MultipartFile>): List<Video> = videos.map { video ->
+        val uniqueKey = UUID.randomUUID()
+        val videoExtension = video.originalFilename?.split(".")?.lastOrNull() ?: "mp4"
+
+        val objectKey = "$uniqueKey.$videoExtension"
+        val uploadedFile = storage.upload(video, objectKey)
         val uploadedFileURL = uploadedFile.toString()
+
         val savedVideo = repository.save(Video(videoUrl = uploadedFileURL, status = Status.PENDING))
 
         queue.dispatch(
             VideoMessage(
                 id = savedVideo.id!!,
-                videoUrl = uploadedFileURL
+                identifier = objectKey,
+                url = uploadedFileURL,
+                extension = video.originalFilename?.split(".")?.lastOrNull() ?: "mp4"
             )
         )
+
+        return@map savedVideo
     }
 
-    fun findAll(): List<Video> {
-        return emptyList()
-    }
+    fun findAll(): List<Video> = repository.findAll().toList()
 
-    fun findById(videoId: String): Video? {
-        return null
-    }
+    fun findById(videoId: Long): Video? = repository.findById(videoId).orElseThrow()
 
-    fun delete(videoId: String): Unit {
-        println("Deleting video $videoId")
-    }
-
-    fun extractFrames(video: VideoMessage): Unit {
+    fun extractFrames(video: VideoMessage) {
         kotlin.runCatching {
-            s3Client.framesFrom(video.videoUrl).also {
-                val zipUrl = s3Client.upload(it, "zip", "application/zip")
-                repository.updateById(video.id, Status.COMPLETED, zipUrl.path)
+            storage.download(video.identifier).also {
+                val frames = converter.from(it, video.identifier, video.extension)
+                storage.upload(frames, "zip", "application/zip", "${video.identifier}.zip")
+                    .also { zipUrl -> repository.updateById(video.id, Status.COMPLETED, zipUrl.toString()) }
             }
-        }.onFailure {
-            println("--> Failed extracting frames from video ${video.id} - ${it.message} - ${it.stackTraceToString()}")
+        }.onFailure { err ->
             repository.updateById(video.id, Status.FAILED, "")
+                .also {
+                    mail.notify(
+                        to = "user@example.com",
+                        subject = "falha ao extrair imagem de videos",
+                        body = "error: ${err.message}"
+                    )
+                }
         }
     }
 }

@@ -5,5 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 
 data class VideoMessage @JsonCreator constructor(
     @JsonProperty("id") val id: Long,
-    @JsonProperty("videoUrl") val videoUrl: String
+    @JsonProperty("url") val url: String,
+    @JsonProperty("identifier") val identifier: String,
+    @JsonProperty("extension") val extension: String
 )

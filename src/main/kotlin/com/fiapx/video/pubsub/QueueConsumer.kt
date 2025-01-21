@@ -11,7 +11,7 @@ class QueueConsumer(private val service: VideoService) {
 
     @SqsListener("videos")
     fun consume(@Payload message: VideoMessage) {
-        println("Received message: ${message.id} - ${message.videoUrl}")
+        println("Received message: ${message.id} - ${message.url}")
         service.extractFrames(message)
     }
 }
