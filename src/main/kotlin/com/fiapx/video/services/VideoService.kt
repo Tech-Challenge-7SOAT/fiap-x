@@ -23,13 +23,12 @@ class VideoService(
     private val queue: SqsTemplate,
     private val converter: VideoConverter,
     private val repository: VideoRepository,
+    @Value("\${sqs.queue-url:random-queue-name}")
+    private val queueName: String
 ) {
 
     @Value("\${sns.topic.arn}")
     private lateinit var topic: String
-
-    @Value("\${sqs.queue-url}")
-    private lateinit var queueName: String
 
     fun store(videos: List<MultipartFile>): List<Video> = videos.map { video ->
         val uniqueKey = UUID.randomUUID()
@@ -65,7 +64,7 @@ class VideoService(
                     .also { zipUrl -> repository.updateById(video.id, Status.COMPLETED, zipUrl.toString()) }
             }
         }.onFailure { err ->
-            repository.updateById(video.id, Status.FAILED, "")
+            repository.updateById(video.id, Status.FAILED)
                 .also {
                     mail.notify(
                         to = "user@example.com",
