@@ -3,11 +3,12 @@ package com.fiapx.video.services
 import com.fiapx.video.entities.Status
 import com.fiapx.video.entities.Video
 import com.fiapx.video.entities.VideoMessage
+import com.fiapx.video.extensions.dispatch
 import com.fiapx.video.extensions.download
 import com.fiapx.video.extensions.notify
 import com.fiapx.video.extensions.upload
-import com.fiapx.video.pubsub.QueueProducer
 import com.fiapx.video.repositories.VideoRepository
+import io.awspring.cloud.sqs.operations.SqsTemplate
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
@@ -19,13 +20,16 @@ import java.util.*
 class VideoService(
     private val mail: SesClient,
     private val storage: S3Client,
-    private val queue: QueueProducer,
+    private val queue: SqsTemplate,
     private val converter: VideoConverter,
     private val repository: VideoRepository,
 ) {
 
     @Value("\${sns.topic.arn}")
     private lateinit var topic: String
+
+    @Value("\${sqs.queue-url}")
+    private lateinit var queueName: String
 
     fun store(videos: List<MultipartFile>): List<Video> = videos.map { video ->
         val uniqueKey = UUID.randomUUID()
@@ -36,15 +40,14 @@ class VideoService(
         val uploadedFileURL = uploadedFile.toString()
 
         val savedVideo = repository.save(Video(videoUrl = uploadedFileURL, status = Status.PENDING))
-
-        queue.dispatch(
-            VideoMessage(
-                id = savedVideo.id!!,
-                identifier = objectKey,
-                url = uploadedFileURL,
-                extension = video.originalFilename?.split(".")?.lastOrNull() ?: "mp4"
-            )
+        val message = VideoMessage(
+            id = savedVideo.id!!,
+            identifier = objectKey,
+            url = uploadedFileURL,
+            extension = video.originalFilename?.split(".")?.lastOrNull() ?: "mp4"
         )
+
+        queue.dispatch(queueName, message)
 
         return@map savedVideo
     }
@@ -55,6 +58,7 @@ class VideoService(
 
     fun extractFrames(video: VideoMessage) {
         kotlin.runCatching {
+            repository.updateById(video.id, Status.PROCESSING)
             storage.download(video.identifier).also {
                 val frames = converter.from(it, video.identifier, video.extension)
                 storage.upload(frames, "zip", "application/zip", "${video.identifier}.zip")

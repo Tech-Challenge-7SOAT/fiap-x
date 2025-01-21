@@ -13,4 +13,10 @@ interface VideoRepository : CrudRepository<Video, Long> {
     @Modifying
     @Transactional
     fun updateById(id: Long, status: Status, framesUrl: String): Int
+
+    @Query("update Video v set v.status = :status where v.id = :id")
+    @Modifying
+    @Transactional
+    fun updateById(id: Long, status: Status): Int
+
 }
