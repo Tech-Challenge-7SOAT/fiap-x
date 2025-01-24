@@ -31,4 +31,4 @@ jobs:
           context: .
           file: Dockerfile
           push: true
-          tags: 692348767810.dkr.ecr.us-east-1.amazonaws.com/fiapx-api/order:latest
+          tags: 448628038787.dkr.ecr.us-east-1.amazonaws.com/fiapx-api/order:latest
