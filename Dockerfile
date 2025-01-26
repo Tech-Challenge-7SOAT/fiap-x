@@ -1,4 +1,4 @@
-FROM openjdk:21-jdk-apine
+FROM openjdk:21-jdk-alpine
 
 VOLUME /tmp
 
