@@ -45,7 +45,7 @@ API para extração de frames de vídeos com processamento assíncrono e armazen
     git clone <repo_url>
     cd <repo_folder>
     ```
-2. Configure as variáveis de ambiente no arquivo .env.
+2. Configure as variáveis de ambiente nos arquivos de `application.properties`.
 3. Suba o ambiente com Docker Compose:
     ```bash
     docker-compose up --build
