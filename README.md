@@ -59,6 +59,7 @@ sequenceDiagram
     Usuario->>+FiapX: Envia arquivo
     FiapX->>+S3: Salva arquivo de video
     FiapX->>+Postgres: Salva dados de video incluindo URL para download
+    Postgres-->>-FiapX: Retorna dados salvos no banco
     FiapX->>+SQS: Envia dados para processamento
 
     FiapX-->>Usuario: Retorna dados de video armazenado
