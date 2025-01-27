@@ -12,10 +12,12 @@ RUN apk add --no-cache dos2unix
 
 RUN dos2unix ./mvnw && chmod +x ./mvnw
 
+RUN ls -la .mvn/wrapper
+
 RUN ./mvnw clean package -DskipTests
 
 EXPOSE 8080
 
-RUN mv /work/target/fastfood-api-0.0.1-SNAPSHOT.jar /work/app.jar
+RUN mv /work/target/fiap-x-0.0.1-SNAPSHOT.jar /work/app.jar
 
 ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/work/app.jar"]
