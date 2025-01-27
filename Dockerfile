@@ -1,23 +1,50 @@
-FROM openjdk:17-jdk-alpine
+# Build stage
+FROM amazoncorretto:17-alpine AS builder
 
-VOLUME /tmp
+WORKDIR /build
 
-RUN mkdir /work
+# Install required packages
+RUN apk add --no-cache \
+    dos2unix \
+    maven
 
-COPY . /work
+# Copy only pom.xml first to cache dependencies
+COPY pom.xml .
 
-WORKDIR /work
+RUN mvn dependency:go-offline
 
-RUN apk add --no-cache dos2unix
+# Copy source code
+COPY src src/
 
-RUN dos2unix ./mvnw && chmod +x ./mvnw
+# Build the application
+RUN mvn clean package -DskipTests
 
-RUN ls -la .mvn/wrapper
+# Runtime stage
+FROM amazoncorretto:17-alpine
 
-RUN ./mvnw clean package -DskipTests
+WORKDIR /app
+
+# Add non-root user
+RUN addgroup -S spring && \
+    adduser -S spring -G spring
+
+# Copy the built artifact from builder stage
+COPY --from=builder /build/target/*.jar app.jar
+
+# Set ownership to spring user
+RUN chown spring:spring app.jar
+
+# Use spring as non-root user
+USER spring
+
+# Configure JVM options
+ENV JAVA_OPTS="-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0"
+
+# Set health check
+HEALTHCHECK --interval=30s --timeout=3s \
+  CMD wget -q --spider http://localhost:8080/actuator/health || exit 1
 
 EXPOSE 8080
 
-RUN mv /work/target/fiap-x-0.0.1-SNAPSHOT.jar /work/app.jar
-
-ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/work/app.jar"]
+# Run the application with proper memory settings
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -jar app.jar"]
