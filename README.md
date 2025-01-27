@@ -51,7 +51,7 @@ API para extração de frames de vídeos com processamento assíncrono e armazen
     docker-compose up --build
     ```
 
-## Arquitetura Resumida
+## Diagrama de sequência
 
 ```mermaid
 sequenceDiagram
