@@ -50,3 +50,33 @@ API para extração de frames de vídeos com processamento assíncrono e armazen
     ```bash
     docker-compose up --build
     ```
+
+## Arquitetura Resumida
+
+```mermaid
+sequenceDiagram
+    actor Usuario
+    Usuario->>+FiapX: Envia arquivo
+    FiapX->>+S3: Salva arquivo de video
+    FiapX->>+Postgres: Salva dados de video incluindo URL para download
+    FiapX->>+SQS: Envia dados para processamento
+
+    FiapX-->>Usuario: Retorna dados de video armazenado
+
+    rect rgba(0, 0, 255, .1)
+        Note right of FiapX: Processamento assincrono
+        SQS-->>-FiapX: Lê dados para processamento
+        FiapX->>+S3: Solicita arquivo de video
+        S3-->>-FiapX: Devolve arquivo de de video
+        FiapX->>+FiapX: Extrai frames do video
+
+        alt erro ao extrair frames
+            FiapX->>+SNS: Envia e-mail para notificar o usuario
+        else
+            FiapX->>+S3: Armazena frames em formato zip
+            FiapX->>+Postgres: Salva informações do arquivo zip
+        end
+    end
+```
+
+
