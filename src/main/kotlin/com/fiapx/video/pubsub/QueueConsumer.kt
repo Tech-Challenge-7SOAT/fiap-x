@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component
 @Component
 class QueueConsumer(private val service: VideoService) {
 
-    @SqsListener("videos")
+    @SqsListener("fiap-x-queue")
     fun consume(@Payload message: VideoMessage) {
         println("Received message: ${message.id} - ${message.url}")
         service.extractFrames(message)

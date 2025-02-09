@@ -12,7 +12,7 @@ import kotlin.io.path.writeBytes
 
 fun S3Client.download(identifier: String): ByteArray {
     val request = GetObjectRequest.builder()
-        .bucket("fiap-x-storage")
+        .bucket("fiapx-videos")
         .key(identifier)
         .build()
 
@@ -23,7 +23,7 @@ fun S3Client.upload(videoData: MultipartFile, identifier: String): URL {
     val tempFile = Files.createTempFile("upload", identifier).also { videoData.transferTo(it) }
 
     val request = PutObjectRequest.builder()
-        .bucket("fiap-x-storage")
+        .bucket("fiapx-videos")
         .key(identifier)
         .contentType(videoData.contentType ?: "application/octet-stream")
         .build()
@@ -31,7 +31,7 @@ fun S3Client.upload(videoData: MultipartFile, identifier: String): URL {
     this.putObject(request, tempFile)
 
     return this.utilities()
-        .getUrl { it.bucket("fiap-x-storage").key(identifier) }
+        .getUrl { it.bucket("fiapx-videos").key(identifier) }
         .also { tempFile.deleteIfExists() }
 }
 
@@ -39,12 +39,12 @@ fun S3Client.upload(videoData: ByteArray, extension: String, contentType: String
     val tempFile = createTempFile("upload", "video.$extension").also { it.writeBytes(videoData) }
 
     val request = PutObjectRequest.builder()
-        .bucket("fiap-x-storage")
+        .bucket("fiapx-videos")
         .key(identifier)
         .contentType(contentType)
         .build()
 
     this.putObject(request, tempFile)
 
-    return this.utilities().getUrl { it.bucket("fiap-x-storage").key(identifier) }
+    return this.utilities().getUrl { it.bucket("fiapx-videos").key(identifier) }
 }
