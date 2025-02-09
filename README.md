@@ -79,3 +79,6 @@ sequenceDiagram
         end
     end
 ```
+
+## Diagrama de arquitetura 
+![Arquitetura drawio](https://github.com/user-attachments/assets/ce066403-296c-4a94-bc1b-7b8c89dee96b)
