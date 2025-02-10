@@ -3,8 +3,7 @@ name: Docker Build and Push to ECR
 on:
   push:
     branches:
-      # - feature/*
-      - main
+      - feature/*
 
 jobs:
   build:
