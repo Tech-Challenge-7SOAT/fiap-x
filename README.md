@@ -82,3 +82,17 @@ sequenceDiagram
 
 ## Diagrama de arquitetura 
 ![Arquitetura drawio](https://github.com/user-attachments/assets/ce066403-296c-4a94-bc1b-7b8c89dee96b)
+
+## Repositório dos recursos AWS
+
+API Gateway: https://github.com/Tech-Challenge-7SOAT/api-gateway-fiap-x
+
+ECS: https://github.com/Tech-Challenge-7SOAT/ecs-fiap-x
+
+RDS: https://github.com/Tech-Challenge-7SOAT/rds-fiap-x
+
+S3: https://github.com/Tech-Challenge-7SOAT/s3-fiap-x
+
+SNS: https://github.com/Tech-Challenge-7SOAT/sns-fiap-x
+
+SQS: https://github.com/Tech-Challenge-7SOAT/sqs-fiap-x
