@@ -1,3 +1,5 @@
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Tech-Challenge-7SOAT_fiap-x&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=Tech-Challenge-7SOAT_fiap-x)
+
 # Video Frame Extractor API - Fiap-X
 
 API para extração de frames de vídeos com processamento assíncrono e armazenamento em S3.
